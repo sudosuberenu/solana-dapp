@@ -32,28 +32,35 @@ export const AvarageBalanceView: FC = ({ }) => {
   return (
     <section className="flex flex-col items-center my-10">
       <h2 className="w-10/12 lg:w-2/3 text-center rounded-lg my-6 text-5xl p-4 bg-gradient-to-tr from-[#9945FF] to-[#14F195]">Avarage Balance in last 24 hours</h2>
-      <table className="w-10/12 lg:w-2/3 bg-neutral rounded-lg text-center p-4">
-        <thead> 
-          <tr>
-            <th>Hour Bucket</th>
-            <th>AVG</th>
-            <th>Num. Txs</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            buckets.map((bucket) => {
-              return (
-                <tr key={bucket.hour}>
-                  <td>{bucket.hour}</td>
-                  <td>{bucket.avg}</td>
-                  <td>{bucket.txs.length}</td>
-                </tr>
-              )
-            })
-          }
-        </tbody>
-      </table>
+      <div className="w-10/12 lg:w-2/3 bg-neutral rounded-lg text-center">
+      {
+        wallet.publicKey && buckets.length ?
+          <table className="min-w-max w-full">
+          <thead> 
+            <tr className="bg-gray-700 text-gray-300 uppercase text-l leading-normal">
+              <th className="py-3 px-6 text-center">Hour Bucket</th>
+              <th className="py-3 px-6 text-center">AVG</th>
+              <th className="py-3 px-6 text-center">Num. Txs</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-400"> 
+            {
+              buckets.map((bucket) => {
+                return (
+                  <tr key={bucket.hour} className="hover:bg-gray-700">
+                    <td>{bucket.hour}</td>
+                    <td>{bucket.avg}</td>
+                    <td>{bucket.txs.length}</td>
+                  </tr>
+                )
+              })
+            }
+          </tbody>
+        </table>
+      :
+        <p className="p-8 text-xl">Please, connect your wallet :) </p>
+      }
+      </div>
     </section>
   );
 };

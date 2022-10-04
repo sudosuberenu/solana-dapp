@@ -1,24 +1,21 @@
 
-# Solana dApp Scaffold Next
+# Solana dApp
 
-The Solana dApp Scaffold repos are meant to house good starting scaffolds for ecosystem developers to get up and running quickly with a front end client UI that integrates several common features found in dApps with some basic usage examples. Wallet Integration. State management. Components examples. Notifications. Setup recommendations.
+This dapp has 2 main responsabilities:
+
+1) Lists all outbound (sent by the connected wallet) and inbound (sent to the connected wallet) SOL transactions in the last 24 hours (unix_timestamp, from_address, to_address, SOL amount)
+
+2) Displays the connected wallet's SOL average balance in 1 hour buckets for the last 24 hours
 
 Responsive                     |  Desktop
 :-------------------------:|:-------------------------:
 ![](scaffold-mobile.png)  |  ![](scaffold-desktop.png)
 
-## Getting Started
-
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-The responsive version for wallets and wallet adapter may not function or work as expected for mobile based on plugin and wallet compatibility. For more code examples and implementations please visit the [Solana Cookbook](https://solanacookbook.com/)
 
 ## Installation
 
 ```bash
 npm install
-# or
-yarn install
 ```
 
 ## Build and Run
@@ -27,13 +24,10 @@ Next, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
 [API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
