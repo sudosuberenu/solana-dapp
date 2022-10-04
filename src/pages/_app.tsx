@@ -5,30 +5,28 @@ import { ContextProvider } from '../contexts/ContextProvider';
 import { Menu } from '../components/Menu';
 import { ContentContainer } from '../components/ContentContainer';
 import { Footer } from '../components/Footer';
-import Notifications from '../components/Notification'
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 require('../styles/globals.css');
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
-    return (
-        <>
-          <Head>
-            <title>Mean - Solana Dapp</title>
-          </Head>
+  return (
+    <>
+      <Head>
+        <title>Mean - Solana Dapp</title>
+      </Head>
 
-          <ContextProvider>
-            <div className="flex flex-col h-screen">
-              <Notifications />
-              <Menu/>
-              <ContentContainer>
-                <Component {...pageProps} />
-              </ContentContainer>
-              <Footer/>
-            </div>
-          </ContextProvider>
-        </>
-    );
+      <ContextProvider>
+        <div className="flex flex-col h-screen">
+          <Menu/>
+          <ContentContainer>
+            <Component {...pageProps} />
+          </ContentContainer>
+          <Footer/>
+        </div>
+      </ContextProvider>
+    </>
+  );
 };
 
 export default App;

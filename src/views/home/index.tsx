@@ -29,7 +29,7 @@ export const HomeView: FC = ({ }) => {
   return (
     <section className="flex flex-col items-center my-10">
       <h2 className="w-10/12 lg:w-2/3 text-center rounded-lg my-6 text-5xl p-4 bg-gradient-to-tr from-[#9945FF] to-[#14F195]">All transactions in last 24 hours</h2>
-      <div className="bg-neutral rounded-lg text-center">
+      <div className="bg-neutral rounded-lg text-center bg-neutral rounded-lg text-center">
       {
         wallet.publicKey && txs.length ?
           <table className="min-w-max w-full">
@@ -53,8 +53,8 @@ export const HomeView: FC = ({ }) => {
                   <td className="cursor-default">{tx.transaction.message.instructions[0].parsed.info.lamports / LAMPORTS_PER_SOL}</td>
                   <td className="cursor-default text-center">
                     <a className="text-center" href={`https://explorer.solana.com/tx/` + tx.transaction.signatures[0] + `?cluster=devnet`} target="_blank">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 inline">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 inline">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                       </svg>
                     </a>
                   </td>

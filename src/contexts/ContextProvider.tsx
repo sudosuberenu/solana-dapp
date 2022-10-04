@@ -9,9 +9,8 @@ import {
     TorusWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
-import { FC, ReactNode, useCallback, useMemo } from 'react';
+import { FC, ReactNode, useMemo } from 'react';
 import { AutoConnectProvider, useAutoConnect } from './AutoConnectProvider';
-import { notify } from "../utils/notifications";
 import { NetworkConfigurationProvider, useNetworkConfiguration } from './NetworkConfigurationProvider';
 
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
@@ -19,8 +18,6 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     const { networkConfiguration } = useNetworkConfiguration();
     const network = networkConfiguration as WalletAdapterNetwork;
     const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
-    console.log('Network selected', network);
 
     const wallets = useMemo(
       () => [
@@ -33,17 +30,9 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
       [network]
     );
 
-    const onError = useCallback(
-      (error: WalletError) => {
-        notify({ type: 'error', message: error.message ? `${error.name}: ${error.message}` : error.name });
-        console.error(error);
-      },
-      []
-    );
-
     return (
       <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets as Adapter[]} onError={onError} autoConnect={autoConnect}>
+        <WalletProvider wallets={wallets as Adapter[]} autoConnect={autoConnect}>
           <ReactUIWalletModalProvider>{children}</ReactUIWalletModalProvider>
         </WalletProvider>
       </ConnectionProvider>

@@ -1,6 +1,5 @@
 import create, { State } from 'zustand'
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
-import { group } from 'console';
 
 interface UserTxsStore extends State {
   txs: Array<any>;
@@ -13,31 +12,19 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
   txs: [],
   buckets: [],
   getUserLast24HoursTxs: async (publicKey, connection) => {
-    let txsDetails = [];
+    let last24Txs = [];
     try {
-      const txs = await connection.getSignaturesForAddress(publicKey);
-      let previousDayDate = new Date();
-      previousDayDate.setDate(previousDayDate.getDate() - 1);
-      const previousDayUnixTimeStamp = Math.floor(previousDayDate.getTime() / 1000);
-        
-      const last24txs = txs.filter(tx => tx.blockTime >= previousDayUnixTimeStamp);
-      const signatureTxs = last24txs.map(tx => tx.signature);
-      txsDetails = await connection.getParsedTransactions(signatureTxs);
-
-      connection.onAccountChange(publicKey, () => {
-        console.log('change!')
-      }, 'confirmed')
-
+      last24Txs = await fetchUserLast24HoursTxs(publicKey, connection);
     } catch (e) {
       console.log(`error getting balance: `, e);
     }
     set((s) => {
-      s.txs = txsDetails;
+      s.txs = last24Txs;
       console.log(`txs updated, `, s.txs);
     })
   },
   getUserBuckets: async (publicKey, connection) => {
-    var output = new Array(24).fill({}).map((_item, index) => (
+    let buckets = new Array(24).fill({}).map((_item, index) => (
       {
         hour: index,
         avg: 0,
@@ -45,14 +32,7 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
       }));
 
     try {
-      const txs = await connection.getSignaturesForAddress(publicKey);
-      let previousDayDate = new Date();
-      previousDayDate.setDate(previousDayDate.getDate() - 1);
-      const previousDayUnixTimeStamp = Math.floor(previousDayDate.getTime() / 1000);
-        
-      const last24txs = txs.filter(tx => tx.blockTime >= previousDayUnixTimeStamp);
-      const signatureTxs = last24txs.map(tx => tx.signature);
-      let txsDetails = await connection.getParsedTransactions(signatureTxs);
+      const last24Txs = await fetchUserLast24HoursTxs(publicKey, connection);
 
       const groupByHour = (txs) => {
         return txs.reduce((groups, tx) => {
@@ -61,27 +41,10 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
 
           groups[hour]['txs'].push(tx);
           return groups
-        }, output)
+        }, buckets)
       };
 
-
-      // const groupByHour = (txs) => {
-      //   return txs.reduce((groups, note) => {
-      //     const date = new Date(note.blockTime * 1000);
-      //     const hour = date.getHours();
-          
-      //     if (!groups.hasOwnProperty(hour)) {
-      //       groups[hour] = []
-      //     }
-
-      //     groups[hour].push(note)
-      //     return groups
-      //   }, {})
-      // };
-
-
-
-      const groupedByHour = groupByHour(txsDetails);
+      const groupedByHour = groupByHour(last24Txs);
       
       for (let [key, value] of Object.entries(groupedByHour)) {
         const bucket = value;
@@ -90,9 +53,7 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
           const totalBalance = bucket.txs.reduce((prev, current) => {
             return prev + current.meta.postBalances[1] 
           }, 0);
-          console.log(totalBalance)
           const avgBalance = ((totalBalance / LAMPORTS_PER_SOL) / bucket.txs.length);
-          console.log(avgBalance)
           bucket.avg = avgBalance;
         }
       }
@@ -102,8 +63,7 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
     }
 
     set((s) => {
-      s.buckets = output;
-      // console.log(`txs updated, `, s.buckets);
+      s.buckets = buckets;
     })
   },
   processBuckets: (txs) => {
@@ -114,5 +74,18 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
     }
   }
 }));
+
+async function fetchUserLast24HoursTxs(publicKey, connection): Promise<[]> {
+  const txs = await connection.getSignaturesForAddress(publicKey);
+  let previousDayDate = new Date();
+  previousDayDate.setDate(previousDayDate.getDate() - 1);
+  const previousDayUnixTimeStamp = Math.floor(previousDayDate.getTime() / 1000);
+    
+  const last24txs = txs.filter(tx => tx.blockTime >= previousDayUnixTimeStamp);
+  const signatureTxs = last24txs.map(tx => tx.signature);
+  let last24txsDetails = await connection.getParsedTransactions(signatureTxs);
+
+  return last24txsDetails;
+}
 
 export default useUserSOLTxsStore;
