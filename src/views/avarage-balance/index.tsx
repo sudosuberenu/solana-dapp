@@ -39,7 +39,7 @@ export const AvarageBalanceView: FC = ({ }) => {
           <thead> 
             <tr className="bg-gray-700 text-gray-300 uppercase text-l leading-normal">
               <th className="py-3 px-6 text-center">Hour Bucket</th>
-              <th className="py-3 px-6 text-center">AVG</th>
+              <th className="py-3 px-6 text-center">AVG (SOL)</th>
               <th className="py-3 px-6 text-center">Num. Txs</th>
             </tr>
           </thead>
@@ -48,7 +48,7 @@ export const AvarageBalanceView: FC = ({ }) => {
               buckets.map((bucket) => {
                 return (
                   <tr key={bucket.hour} className="hover:bg-gray-700">
-                    <td>{bucket.hour}</td>
+                    <td>{bucket.hour}:00</td>
                     <td>{bucket.avg}</td>
                     <td>{bucket.txs.length}</td>
                   </tr>

@@ -16,11 +16,10 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
     try {
       last24Txs = await fetchUserLast24HoursTxs(publicKey, connection);
     } catch (e) {
-      console.log(`error getting balance: `, e);
+      console.log(`error getting last txs: `, e);
     }
     set((s) => {
       s.txs = last24Txs;
-      console.log(`txs updated, `, s.txs);
     })
   },
   getUserBuckets: async (publicKey, connection) => {
@@ -51,11 +50,18 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
 
         if (bucket.txs.length) {
           const totalBalance = bucket.txs.reduce((prev, current) => {
-            return prev + current.meta.postBalances[1] 
+            if (current.transaction.message.instructions[0].parsed.info.destination === publicKey.toString()) {
+              return prev + current.meta.postBalances[1] 
+            }
+            return prev + current.meta.postBalances[0] 
           }, 0);
           const avgBalance = ((totalBalance / LAMPORTS_PER_SOL) / bucket.txs.length);
           bucket.avg = avgBalance;
         }
+      }
+
+      for (let i = buckets.length - 1; i >= 0; i--) {
+        fillEmptyBucketsWithPreviousBalance(buckets, i)
       }
 
     } catch (e) {
@@ -66,13 +72,6 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
       s.buckets = buckets;
     })
   },
-  processBuckets: (txs) => {
-    for (let i = 0; i < txs.length; i++) {
-      const tx = txs[i];
-
-      console.log(tx)
-    }
-  }
 }));
 
 async function fetchUserLast24HoursTxs(publicKey, connection): Promise<[]> {
@@ -86,6 +85,17 @@ async function fetchUserLast24HoursTxs(publicKey, connection): Promise<[]> {
   let last24txsDetails = await connection.getParsedTransactions(signatureTxs);
 
   return last24txsDetails;
+}
+
+function fillEmptyBucketsWithPreviousBalance(buckets, index) {
+  if (index < 0) {
+    index = index + buckets.length;
+  }
+
+  if (buckets[index].avg === 0) {
+    buckets[index].avg = fillEmptyBucketsWithPreviousBalance(buckets, index - 1)
+  }
+  return buckets[index].avg;
 }
 
 export default useUserSOLTxsStore;
