@@ -51,3 +51,9 @@ style, package, configuration, and other project files
 ## Deployed on Vercel
 
 [https://solana-dapp.vercel.app/](https://solana-dapp.vercel.app/)
+
+
+## Pending staff
+    1. Add UT and E2E testing
+    2. Apply skeleton loader
+    3. Improve responsiness
