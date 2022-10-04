@@ -1,4 +1,4 @@
-import { WalletAdapterNetwork, WalletError } from '@solana/wallet-adapter-base';
+import { Adapter, WalletAdapterNetwork, WalletError } from '@solana/wallet-adapter-base';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider as ReactUIWalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import {
@@ -43,7 +43,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
     return (
       <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets} onError={onError} autoConnect={autoConnect}>
+        <WalletProvider wallets={wallets as Adapter[]} onError={onError} autoConnect={autoConnect}>
           <ReactUIWalletModalProvider>{children}</ReactUIWalletModalProvider>
         </WalletProvider>
       </ConnectionProvider>
