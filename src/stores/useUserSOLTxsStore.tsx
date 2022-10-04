@@ -48,14 +48,18 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
       for (let [key, value] of Object.entries(groupedByHour)) {
         const bucket = value;
 
+        /* @ts-ignore */
         if (bucket.txs.length) {
+          /* @ts-ignore */
           const totalBalance = bucket.txs.reduce((prev, current) => {
             if (current.transaction.message.instructions[0].parsed.info.destination === publicKey.toString()) {
               return prev + current.meta.postBalances[1] 
             }
             return prev + current.meta.postBalances[0] 
           }, 0);
+          /* @ts-ignore */
           const avgBalance = ((totalBalance / LAMPORTS_PER_SOL) / bucket.txs.length);
+          /* @ts-ignore */
           bucket.avg = avgBalance;
         }
       }
