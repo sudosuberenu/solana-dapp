@@ -8,7 +8,9 @@ This dapp has 2 main responsabilities:
 2) Displays the connected wallet's SOL average balance in 1 hour buckets for the last 24 hours
 
 ## Images
-![](1.png)  |  ![](2p.png)
+![](https://raw.githubusercontent.com/sudosuberenu/solana-dapp/main/public/1.png)
+
+![](https://raw.githubusercontent.com/sudosuberenu/solana-dapp/main/public/2.png)
 
 
 ## Installation
