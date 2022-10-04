@@ -7,9 +7,8 @@ This dapp has 2 main responsabilities:
 
 2) Displays the connected wallet's SOL average balance in 1 hour buckets for the last 24 hours
 
-Responsive                     |  Desktop
-:-------------------------:|:-------------------------:
-![](scaffold-mobile.png)  |  ![](scaffold-desktop.png)
+## Images
+![](1.png)  |  ![](2p.png)
 
 
 ## Installation
