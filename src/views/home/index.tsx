@@ -29,10 +29,10 @@ export const HomeView: FC = ({ }) => {
   return (
     <section className="flex flex-col items-center my-10">
       <h2 className="w-10/12 lg:w-2/3 text-center rounded-lg my-6 text-5xl p-4 bg-gradient-to-tr from-[#9945FF] to-[#14F195]">All transactions in last 24 hours</h2>
-      <div className="bg-neutral rounded-lg text-center bg-neutral rounded-lg text-center">
+      <div className="w-10/12 bg-neutral rounded-lg text-center bg-neutral rounded-lg text-center">
       {
         wallet.publicKey && txs.length ?
-          <table className="min-w-max w-full">
+          <table className="w-full">
             <thead>
               <tr className="bg-gray-700 text-gray-300 uppercase text-l leading-normal">
                 <th className="py-3 px-6 text-center">Timestamp</th>

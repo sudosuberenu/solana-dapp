@@ -35,10 +35,10 @@ export const AvarageBalanceView: FC = ({ }) => {
       <div className="w-10/12 lg:w-2/3 bg-neutral rounded-lg text-center">
       {
         wallet.publicKey && buckets.length ?
-          <table className="min-w-max w-full">
+          <table className="w-full">
           <thead> 
             <tr className="bg-gray-700 text-gray-300 uppercase text-l leading-normal">
-              <th className="py-3 px-6 text-center">Hour Bucket</th>
+              <th className="py-3 px-6 text-center">Last Hour Bucket</th>
               <th className="py-3 px-6 text-center">AVG (SOL)</th>
               <th className="py-3 px-6 text-center">Num. Txs</th>
             </tr>
