@@ -55,7 +55,7 @@ style, package, configuration, and other project files
 [https://solana-dapp.vercel.app/](https://solana-dapp.vercel.app/)
 
 
-## Pending staff
+## Pending to finish
     1. Add UT and E2E testing
     2. Apply skeleton loader
     3. Improve responsiness
