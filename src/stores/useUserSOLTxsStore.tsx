@@ -3,15 +3,14 @@ import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 interface UserTxsStore extends State {
   txs: Array<any>;
-  buckets: Array<any>;
+  buckets: Map<Number, any>;
   getUserLast24HoursTxs: (publicKey: PublicKey, connection: Connection) => void;
   getUserBuckets: (publicKey: PublicKey, connection: Connection) => void;
-  getUserBalance: (publicKey: PublicKey, connection: Connection) => void;
 }
 
 const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
   txs: [],
-  buckets: [],
+  buckets: new Map(),
   getUserLast24HoursTxs: async (publicKey, connection) => {
     let last24Txs = [];
     try {
@@ -24,34 +23,58 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
     })
   },
   getUserBuckets: async (publicKey, connection) => {
-    console.log('this', this)
-    let buckets = new Array(24).fill({}).map((_item, index) => (
-      {
-        hour: index,
-        avg: 0,
-        txs: []
-      }));
-
+    let buckets = new Map();
     try {
+      const lastTxs = await fetchUserTxs(publicKey, connection);
       const last24Txs = await fetchUserLast24HoursTxs(publicKey, connection);
 
-      if (!last24Txs.length) {
-        return;
+      const date = new Date();
+      const hour = date.getHours();
+
+      for (let i = hour; i >= 0; i--) {
+        const today = new Date();
+        today.setHours(i);
+
+        let bucket = {
+          hour: i,
+          date: today,
+          avg: 0,
+          txs: []
+        };
+
+        buckets.set(i, bucket);
       }
 
+      for (let i = 23; i > hour; i--) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        yesterday.setHours(i)
+        let bucket = {
+          hour: i,
+          date: yesterday,
+          avg: 0,
+          txs: []
+        };
+
+        buckets.set(i, bucket);
+      }
+
+    
       const groupByHour = (txs) => {
         return txs.reduce((groups, tx) => {
           const date = new Date(tx.blockTime * 1000);
           const hour = date.getHours();
 
-          groups[hour]['txs'].push(tx);
+          const bucket = groups.get(hour);
+          bucket['txs'].push(tx);
           return groups
         }, buckets)
       };
 
       const groupedByHour = groupByHour(last24Txs);
-      
-      for (let [key, value] of Object.entries(groupedByHour)) {
+
+      // Set up the AVGs
+      for (let value of groupedByHour.values()) {
         const bucket = value;
 
         /* @ts-ignore */
@@ -70,8 +93,35 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
         }
       }
 
-      for (let i = buckets.length - 1; i >= 0; i--) {
-        fillEmptyBucketsWithPreviousBalance(buckets, i)
+
+      // Filling up the empty buckets
+      if (lastTxs.length === 0) {
+        set((s) => {
+          s.buckets = buckets;
+        })
+        return;
+      }
+
+      const lastTx = last24Txs[last24Txs.length - 1];
+      /* @ts-ignore */
+      const lastTxDate = new Date(lastTx.blockTime * 1000);
+
+      
+      /* @ts-ignore */
+      for (let value of groupedByHour.values()) {
+        const txs = value.txs;
+        
+        if (txs.length === 0) {
+          
+          /* @ts-ignore */
+          if (lastTx.transaction.message.instructions[0].parsed.info.destination === publicKey.toString()) {
+            /* @ts-ignore */
+            value.avg = (value.date > lastTxDate ) ? lastTx.meta.postBalances[1] / LAMPORTS_PER_SOL: lastTx.meta.preBalances[1] / LAMPORTS_PER_SOL;
+          } else {
+            /* @ts-ignore */
+            value.avg = (value.date > lastTxDate ) ? lastTx.meta.postBalances[0] / LAMPORTS_PER_SOL: lastTx.meta.preBalances[0] / LAMPORTS_PER_SOL;
+          }
+        }
       }
 
     } catch (e) {
@@ -82,11 +132,8 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
       s.buckets = buckets;
     })
   },
-  getUserBalance: async (publicKey, connection) => {
-    const balance = await connection.getBalance(publicKey);
-    return balance;
-  }
 }));
+
 
 async function fetchUserLast24HoursTxs(publicKey, connection): Promise<[]> {
   const txs = await connection.getSignaturesForAddress(publicKey);
@@ -101,15 +148,12 @@ async function fetchUserLast24HoursTxs(publicKey, connection): Promise<[]> {
   return last24txsDetails;
 }
 
-function fillEmptyBucketsWithPreviousBalance(buckets, index) {
-  if (index < 0) {
-    index = index + buckets.length;
-  }
+async function fetchUserTxs(publicKey, connection): Promise<[]> {
+  const txs = await connection.getSignaturesForAddress(publicKey);    
+  const signatureTxs = txs.map(tx => tx.signature);
+  const txsDetails = await connection.getParsedTransactions(signatureTxs);
 
-  if (buckets[index].avg === 0) {
-    buckets[index].avg = fillEmptyBucketsWithPreviousBalance(buckets, index - 1)
-  }
-  return buckets[index].avg;
+  return txsDetails;
 }
 
 export default useUserSOLTxsStore;

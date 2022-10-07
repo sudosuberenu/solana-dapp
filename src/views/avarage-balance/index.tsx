@@ -30,7 +30,7 @@ export const AvarageBalanceView: FC = ({ }) => {
       <h2 className="w-10/12 lg:w-2/3 text-center rounded-lg my-6 text-5xl p-4 bg-gradient-to-tr from-[#9945FF] to-[#14F195]">Avarage Balance in last 24 hours</h2>
       <div className="w-10/12 lg:w-2/3 bg-neutral rounded-lg text-center">
       {
-        wallet.publicKey && buckets.length ?
+        wallet.publicKey ?
           <table className="w-full">
           <thead> 
             <tr className="bg-gray-700 text-gray-300 uppercase text-l leading-normal">
@@ -41,7 +41,7 @@ export const AvarageBalanceView: FC = ({ }) => {
           </thead>
           <tbody className="text-gray-400"> 
             {
-              buckets.map((bucket) => {
+              [...buckets.values()].map((bucket) => {
                 return (
                   <tr key={bucket.hour} className="hover:bg-gray-700">
                     <td>{bucket.hour}:00</td>
