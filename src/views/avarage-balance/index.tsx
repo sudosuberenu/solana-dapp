@@ -1,12 +1,8 @@
-// Next, React
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect } from 'react';
 
-// Wallet
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 
-// Store
 import useUserSOLTxsStore from '../../stores/useUserSOLTxsStore';
-import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 export const AvarageBalanceView: FC = ({ }) => {
   const wallet = useWallet();

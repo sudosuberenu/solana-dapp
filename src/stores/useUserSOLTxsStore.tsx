@@ -6,6 +6,7 @@ interface UserTxsStore extends State {
   buckets: Array<any>;
   getUserLast24HoursTxs: (publicKey: PublicKey, connection: Connection) => void;
   getUserBuckets: (publicKey: PublicKey, connection: Connection) => void;
+  getUserBalance: (publicKey: PublicKey, connection: Connection) => void;
 }
 
 const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
@@ -23,6 +24,7 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
     })
   },
   getUserBuckets: async (publicKey, connection) => {
+    console.log('this', this)
     let buckets = new Array(24).fill({}).map((_item, index) => (
       {
         hour: index,
@@ -32,6 +34,10 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
 
     try {
       const last24Txs = await fetchUserLast24HoursTxs(publicKey, connection);
+
+      if (!last24Txs.length) {
+        return;
+      }
 
       const groupByHour = (txs) => {
         return txs.reduce((groups, tx) => {
@@ -76,6 +82,10 @@ const useUserSOLTxsStore = create<UserTxsStore>((set, _get) => ({
       s.buckets = buckets;
     })
   },
+  getUserBalance: async (publicKey, connection) => {
+    const balance = await connection.getBalance(publicKey);
+    return balance;
+  }
 }));
 
 async function fetchUserLast24HoursTxs(publicKey, connection): Promise<[]> {
